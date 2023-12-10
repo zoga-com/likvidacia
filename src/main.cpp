@@ -1,5 +1,7 @@
+#include <cstdlib>
 #include <iostream>
 #include <math.h>
+#include <new>
 #include <opencv2/core.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
@@ -54,26 +56,35 @@ void draw_rotated_text(cv::Mat& textOverlay, double angleRotate, cv::Mat& image)
 
 void resize_image(cv::Mat& image) {
     std::cout<<"resize_image call"<<std::endl;
-    double _width = image.size().width, _deltaWidth = (3200 / _width);
-    cv::resize(image, image, cv::Mat::zeros(_deltaWidth * image.size().height, _deltaWidth * image.size().width, image.type()).size());
+    double _width, _deltaWidth;
+    if((3200. / image.size().width) <= 2) {
+        _width = image.size().width, _deltaWidth = (3200. / _width);
+    } else {
+        _width = image.size().width, _deltaWidth = (1600. / _width);
+    }
+    cv::resize(image, image, cv::Mat::zeros(image.size().height * _deltaWidth, image.size().width * _deltaWidth, image.type()).size());
 }
 
-void create_png_from_binary(const std::string binary, const std::string fileName) {
+void create_png_from_binary(const std::string& binary, const std::string& fileName) {
     std::cout<<"create_png_from_binary call"<<std::endl;
     std::ofstream _pngFile;
     _pngFile.open(fileName);
     _pngFile<<binary;
 }
 
-bool check_photo_allowed(const std::string image_file) {
+bool check_photo_allowed(const std::string& image_file) {
     return std::filesystem::file_size(image_file) < 5120000 ? true : false; 
 }
 
-double degrees(double radians) {
+double degrees(const double& radians) {
     return radians * (180./M_PI);
 }
 
-void remove_trash_file(std::string filename) {
+void remove_trash_file(const std::string& filename) {
     std::filesystem::remove(filename);
     std::filesystem::remove("done_" + filename);
+}
+
+int random_int(const int& startInt, const int& endInt) {
+    return std::rand() % (endInt - startInt + 1) + startInt;
 }
